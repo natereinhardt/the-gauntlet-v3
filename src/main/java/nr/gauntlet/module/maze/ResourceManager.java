@@ -26,11 +26,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.maze;
+package nr.gauntlet.module.maze;
 
-import ca.gauntlet.TheGauntletConfig;
-import ca.gauntlet.TheGauntletConfig.TrackingMode;
-import ca.gauntlet.TheGauntletPlugin;
+import nr.gauntlet.TheGauntletConfig;
+import nr.gauntlet.TheGauntletConfig.TrackingMode;
+import nr.gauntlet.TheGauntletPlugin;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.AbstractMap;

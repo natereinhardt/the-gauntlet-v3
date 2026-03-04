@@ -28,21 +28,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet;
+package nr.gauntlet;
 
-import ca.gauntlet.module.boss.BossModule;
-import ca.gauntlet.module.maze.MazeModule;
+import nr.gauntlet.module.boss.BossModule;
+import nr.gauntlet.module.history.HistoryPanel;
+import nr.gauntlet.module.history.RunHistoryManager;
+import nr.gauntlet.module.maze.MazeModule;
 import com.google.inject.Provides;
+import java.awt.image.BufferedImage;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
 
+@Slf4j
 @PluginDescriptor(
 	name = "The Gauntlet",
 	description = "All-in-one plugin for The Gauntlet.",
@@ -52,6 +61,21 @@ public final class TheGauntletPlugin extends Plugin
 {
 	private static final int VARBIT_MAZE = 9178;
 	private static final int VARBIT_BOSS = 9177;
+	private static final BufferedImage ICON;
+
+	static
+	{
+		BufferedImage icon = null;
+		try
+		{
+			icon = ImageUtil.loadImageResource(TheGauntletPlugin.class, "icon.png");
+		}
+		catch (Exception e)
+		{
+			// Icon not found, will use null
+		}
+		ICON = icon;
+	}
 
 	@Inject
 	private Client client;
@@ -61,6 +85,15 @@ public final class TheGauntletPlugin extends Plugin
 	private MazeModule mazeModule;
 	@Inject
 	private BossModule bossModule;
+	@Inject
+	private RunHistoryManager historyManager;
+	@Inject
+	private ClientToolbar clientToolbar;
+	@Inject
+	private TheGauntletConfig config;
+
+	private HistoryPanel historyPanel;
+	private NavigationButton navButton;
 
 	@Provides
 	TheGauntletConfig provideConfig(final ConfigManager configManager)
@@ -71,6 +104,12 @@ public final class TheGauntletPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
+		// Initialize history panel
+		if (config.showHistoryPanel())
+		{
+			initializeHistoryPanel();
+		}
+
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			return;
@@ -93,10 +132,61 @@ public final class TheGauntletPlugin extends Plugin
 	{
 		mazeModule.stop();
 		bossModule.stop();
+		removeHistoryPanel();
+	}
+
+	private void initializeHistoryPanel()
+	{
+		if (historyPanel != null)
+		{
+			return;
+		}
+
+		historyPanel = new HistoryPanel(historyManager);
+
+		navButton = NavigationButton.builder()
+			.tooltip("Gauntlet History")
+			.icon(ICON)
+			.priority(8)
+			.panel(historyPanel)
+			.build();
+
+		clientToolbar.addNavigation(navButton);
+	}
+
+	private void removeHistoryPanel()
+	{
+		if (navButton != null)
+		{
+			clientToolbar.removeNavigation(navButton);
+			navButton = null;
+		}
+		historyPanel = null;
 	}
 
 	@Subscribe
-	void onVarbitChanged(final VarbitChanged event)
+	public void onConfigChanged(final ConfigChanged event)
+	{
+		if (!event.getGroup().equals(TheGauntletConfig.CONFIG_GROUP))
+		{
+			return;
+		}
+
+		if (event.getKey().equals("showHistoryPanel"))
+		{
+			if (config.showHistoryPanel())
+			{
+				initializeHistoryPanel();
+			}
+			else
+			{
+				removeHistoryPanel();
+			}
+		}
+	}
+
+	@Subscribe
+	public void onVarbitChanged(final VarbitChanged event)
 	{
 		final int varbit = event.getVarbitId();
 

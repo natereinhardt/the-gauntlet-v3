@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet;
+package nr.gauntlet;
 
 import java.awt.Color;
 import lombok.AllArgsConstructor;
@@ -95,6 +95,14 @@ public interface TheGauntletConfig extends Config
 		closedByDefault = true
 	)
 	String timerSection = "timer";
+
+	@ConfigSection(
+		name = "Run History",
+		description = "Run history and statistics section.",
+		position = 6,
+		closedByDefault = true
+	)
+	String historySection = "history";
 
 	// Resource Tracking
 
@@ -901,6 +909,32 @@ public interface TheGauntletConfig extends Config
 		section = timerSection
 	)
 	default boolean timerChatMessage()
+	{
+		return false;
+	}
+
+	// Run History Section
+
+	@ConfigItem(
+		position = 0,
+		keyName = "trackRunHistory",
+		name = "Track run history",
+		description = "Track detailed statistics for each Gauntlet run.",
+		section = historySection
+	)
+	default boolean trackRunHistory()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 1,
+		keyName = "showHistoryPanel",
+		name = "Show history panel",
+		description = "Show the run history panel with graphs and statistics.",
+		section = historySection
+	)
+	default boolean showHistoryPanel()
 	{
 		return false;
 	}

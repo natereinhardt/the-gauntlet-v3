@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.maze;
+package nr.gauntlet.module.maze;
 
-import ca.gauntlet.TheGauntletConfig;
-import ca.gauntlet.module.Module;
-import ca.gauntlet.module.overlay.TimerOverlay;
+import nr.gauntlet.TheGauntletConfig;
+import nr.gauntlet.module.Module;
+import nr.gauntlet.module.overlay.TimerOverlay;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashSet;

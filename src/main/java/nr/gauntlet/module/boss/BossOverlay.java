@@ -25,11 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.boss;
+package nr.gauntlet.module.boss;
 
-import ca.gauntlet.TheGauntletConfig;
-import ca.gauntlet.TheGauntletConfig.TileOutline;
-import ca.gauntlet.TheGauntletPlugin;
+import nr.gauntlet.TheGauntletConfig;
+import nr.gauntlet.TheGauntletConfig.TileOutline;
+import nr.gauntlet.TheGauntletPlugin;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;

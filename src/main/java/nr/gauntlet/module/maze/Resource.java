@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.maze;
+package nr.gauntlet.module.maze;
 
 import java.util.AbstractMap;
 import java.util.regex.Matcher;

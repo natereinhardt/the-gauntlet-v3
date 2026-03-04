@@ -26,10 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.overlay;
+package nr.gauntlet.module.overlay;
 
-import ca.gauntlet.TheGauntletConfig;
-import ca.gauntlet.TheGauntletPlugin;
+import nr.gauntlet.TheGauntletConfig;
+import nr.gauntlet.TheGauntletPlugin;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;

@@ -25,10 +25,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ca.gauntlet.module.maze;
+package nr.gauntlet.module.maze;
 
-import ca.gauntlet.TheGauntletConfig;
-import ca.gauntlet.TheGauntletPlugin;
+import nr.gauntlet.TheGauntletConfig;
+import nr.gauntlet.TheGauntletPlugin;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.Collection;

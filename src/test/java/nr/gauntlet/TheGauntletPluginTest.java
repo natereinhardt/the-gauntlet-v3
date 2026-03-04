@@ -1,4 +1,4 @@
-package ca.gauntlet;
+package nr.gauntlet;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
