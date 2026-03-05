@@ -20,11 +20,19 @@ Supports both normal and corrupted versions.
 ![outline](/images/outline.png)
 
 ### Run History & Performance Tracking
-* Detailed run statistics (prep time, boss time, total time, deaths)
-* Historical data persistence (CSV export)
-* Interactive performance graphs with moving averages
+* Compact sidebar panel showing recent runs and personal bests
+* One-click HTML export with interactive Chart.js graphs showing:
+  - DPS given/taken over time with moving averages
+  - Tick efficiency trends
+  - Prayer accuracy metrics
+  - Mistake tracking (wrong prayers, attack styles, tornado hits)
+* CSV export for advanced data analysis
 * Separate tracking for Normal and Corrupted Gauntlet
-* Visual HTML reports with Chart.js
+* Persistent run history saved locally
+
+![tracking-window](/images/tracking-window.png)
+
+**Example Report:** [View Sample HTML Report](/images/Gauntlet%20Run%20History.pdf) (Click "View Full Report" button in-game to generate)
 
 ### Live Maze Map
 * Real-time maze mapping as you explore

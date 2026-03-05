@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -60,13 +59,11 @@ import net.runelite.client.ui.PluginPanel;
 @Slf4j
 public class HistoryPanel extends PluginPanel
 {
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd HH:mm");
-
 	private final RunHistoryManager historyManager;
 	private JTable historyTable;
 	private DefaultTableModel tableModel;
-	private MultiMetricChart chart;
 	private JLabel statsLabel;
+	private JLabel personalBestLabel;
 
 	@Inject
 	public HistoryPanel(RunHistoryManager historyManager)
@@ -103,6 +100,14 @@ public class HistoryPanel extends PluginPanel
 		statsLabel.setAlignmentX(CENTER_ALIGNMENT);
 		headerPanel.add(statsLabel);
 
+		headerPanel.add(Box.createVerticalStrut(5));
+
+		// Personal best
+		personalBestLabel = new JLabel();
+		personalBestLabel.setForeground(new Color(76, 175, 80)); // Green
+		personalBestLabel.setAlignmentX(CENTER_ALIGNMENT);
+		headerPanel.add(personalBestLabel);
+
 		add(headerPanel, BorderLayout.NORTH);
 
 		// Main content panel
@@ -110,34 +115,18 @@ public class HistoryPanel extends PluginPanel
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		contentPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		// Chart section - 4x2 grid showing 8 key metrics
-		JPanel chartPanel = new JPanel(new BorderLayout());
-		chartPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		chartPanel.setBorder(BorderFactory.createCompoundBorder(
-			new EmptyBorder(10, 10, 10, 10),
-			BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR)
-		));
-
-		JLabel chartTitle = new JLabel("Performance Metrics (with 5-run moving averages)");
-		chartTitle.setForeground(Color.WHITE);
-		chartTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		chartPanel.add(chartTitle, BorderLayout.NORTH);
-
-		chart = new MultiMetricChart();
-		JScrollPane chartScroll = new JScrollPane(chart);
-		chartScroll.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		chartScroll.setBorder(null);
-		chartPanel.add(chartScroll, BorderLayout.CENTER);
-
-		contentPanel.add(chartPanel);
-		contentPanel.add(Box.createVerticalStrut(10));
-
 		// Table section
 		JPanel tablePanel = new JPanel(new BorderLayout());
 		tablePanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		tablePanel.setBorder(new EmptyBorder(0, 10, 10, 10));
+		tablePanel.setBorder(new EmptyBorder(0, 10, 0, 10));
 
-		String[] columnNames = {"Date", "Ticks", "Used %", "Type", "Attacks", "Dmg", "Outcome"};
+		JLabel tableTitle = new JLabel("Recent Runs");
+		tableTitle.setForeground(Color.WHITE);
+		tableTitle.setFont(tableTitle.getFont().deriveFont(12f));
+		tableTitle.setBorder(new EmptyBorder(0, 0, 5, 0));
+		tablePanel.add(tableTitle, BorderLayout.NORTH);
+
+		String[] columnNames = {"Date", "Time", "Type", "Result"};
 		tableModel = new DefaultTableModel(columnNames, 0)
 		{
 			@Override
@@ -151,9 +140,11 @@ public class HistoryPanel extends PluginPanel
 		historyTable.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		historyTable.setForeground(Color.WHITE);
 		historyTable.setSelectionBackground(ColorScheme.MEDIUM_GRAY_COLOR);
-		historyTable.setRowHeight(25);
-		historyTable.setShowGrid(false);
-		historyTable.setIntercellSpacing(new Dimension(0, 0));
+		historyTable.setRowHeight(30);
+		historyTable.setShowGrid(true);
+		historyTable.setGridColor(ColorScheme.LIGHT_GRAY_COLOR.darker());
+		historyTable.setIntercellSpacing(new Dimension(3, 2));
+		historyTable.setFont(historyTable.getFont().deriveFont(11f));
 
 		// Center align all columns
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -163,39 +154,68 @@ public class HistoryPanel extends PluginPanel
 			historyTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 		}
 
+		// Adjust column widths to fit sidebar better
+		historyTable.getColumnModel().getColumn(0).setPreferredWidth(40); // Date
+		historyTable.getColumnModel().getColumn(0).setMaxWidth(50);
+		historyTable.getColumnModel().getColumn(1).setPreferredWidth(65); // Time
+		historyTable.getColumnModel().getColumn(2).setPreferredWidth(40); // Type
+		historyTable.getColumnModel().getColumn(2).setMaxWidth(50);
+		historyTable.getColumnModel().getColumn(3).setPreferredWidth(45); // Result
+
 		JScrollPane scrollPane = new JScrollPane(historyTable);
 		scrollPane.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		scrollPane.getViewport().setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		tablePanel.add(scrollPane, BorderLayout.CENTER);
 
 		contentPanel.add(tablePanel);
+		contentPanel.add(Box.createVerticalStrut(10));
 
-		// Button panel
+		// Button panel - vertical layout for better space usage
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(2, 2, 5, 5));
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		buttonPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		buttonPanel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
-		JButton refreshButton = new JButton("Refresh");
-		refreshButton.addActionListener(e -> refresh());
-		buttonPanel.add(refreshButton);
+		// Primary action - View Full Report
+		JButton viewReportButton = new JButton("📊 View Full Report (HTML)");
+		viewReportButton.setToolTipText("Opens interactive charts in your browser");
+		viewReportButton.setFont(viewReportButton.getFont().deriveFont(12f));
+		viewReportButton.setBackground(new Color(33, 150, 243));
+		viewReportButton.setForeground(Color.WHITE);
+		viewReportButton.setAlignmentX(CENTER_ALIGNMENT);
+		viewReportButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+		viewReportButton.addActionListener(e -> exportHTML());
+		buttonPanel.add(viewReportButton);
 
-		JButton exportHTMLButton = new JButton("Export HTML");
-		exportHTMLButton.setToolTipText("Export to HTML (opens in browser, can save as PDF)");
-		exportHTMLButton.addActionListener(e -> exportHTML());
-		buttonPanel.add(exportHTMLButton);
+		buttonPanel.add(Box.createVerticalStrut(8));
+
+		// Secondary actions in a row
+		JPanel secondaryPanel = new JPanel(new GridLayout(1, 2, 5, 0));
+		secondaryPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		secondaryPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
 		JButton exportCSVButton = new JButton("Export CSV");
-		exportCSVButton.setToolTipText("Export to CSV for data analysis");
+		exportCSVButton.setToolTipText("Export raw data for analysis");
 		exportCSVButton.addActionListener(e -> exportCSV());
-		buttonPanel.add(exportCSVButton);
+		secondaryPanel.add(exportCSVButton);
 
-		JButton clearButton = new JButton("Clear History");
+		JButton refreshButton = new JButton("Refresh");
+		refreshButton.addActionListener(e -> refresh());
+		secondaryPanel.add(refreshButton);
+
+		buttonPanel.add(secondaryPanel);
+		buttonPanel.add(Box.createVerticalStrut(8));
+
+		// Clear button (danger action)
+		JButton clearButton = new JButton("Clear All History");
+		clearButton.setToolTipText("Permanently delete all run data");
+		clearButton.setForeground(new Color(244, 67, 54)); // Red text
+		clearButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 		clearButton.addActionListener(e ->
 		{
 			int result = JOptionPane.showConfirmDialog(
 				this,
-				"Are you sure you want to delete all run history?",
+				"Are you sure you want to delete all run history?\nThis cannot be undone!",
 				"Clear History",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.WARNING_MESSAGE
@@ -284,30 +304,46 @@ public class HistoryPanel extends PluginPanel
 		long successRuns = history.stream().filter(r -> "SUCCESS".equals(r.getOutcomeDisplay())).count();
 		long deathRuns = history.stream().filter(r -> "DEATH".equals(r.getOutcomeDisplay())).count();
 		long teleportRuns = history.stream().filter(r -> "TELEPORT".equals(r.getOutcomeDisplay())).count();
-		statsLabel.setText(String.format("Total: %d | Success: %d | Deaths: %d | Teleports: %d",
+		statsLabel.setText(String.format("<html><center>Total: %d | Successes: %d | Deaths: %d | Teleports: %d</center></html>",
 			totalRuns, successRuns, deathRuns, teleportRuns));
 
-		// Update table
+		// Find personal best (successful corrupted runs)
+		RunStats personalBest = history.stream()
+			.filter(r -> "SUCCESS".equals(r.getOutcomeDisplay()) && r.isCorrupted())
+			.min((a, b) -> Integer.compare(a.getTotalTicks(), b.getTotalTicks()))
+			.orElse(null);
+
+		if (personalBest != null)
+		{
+			double minutes = personalBest.getTotalTicks() * 0.6 / 60.0;
+			personalBestLabel.setText(String.format("🏆 Personal Best (CG): %d ticks (%.1f min) | %.1f%% efficiency",
+				personalBest.getTotalTicks(), minutes, personalBest.getEfficiency()));
+		}
+		else
+		{
+			personalBestLabel.setText("🏆 No successful corrupted runs yet");
+		}
+
+		// Update table - show most recent runs first
 		tableModel.setRowCount(0);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd");
+		
 		for (RunStats run : history)
 		{
 			String outcome = run.getOutcomeDisplay();
 			String outcomeSymbol = outcome.equals("SUCCESS") ? "✓" :
 															outcome.equals("TELEPORT") ? "◄" : "✗";
+			
+			Date runDate = new Date(run.getDate());
+			String timeDisplay = String.format("%d (%.0f%%)", run.getTotalTicks(), run.getEfficiency());
 
 			Object[] row = {
-				DATE_FORMAT.format(new Date(run.getDate())),
-				run.getTotalTicks(),
-				String.format("%.1f%%", run.getEfficiency()),
-				run.isCorrupted() ? "CG" : "Normal",
-				run.getPlayerAttacks(),
-				run.getDamageTaken(),
-				outcomeSymbol + " " + outcome
+				dateFormat.format(runDate),
+				timeDisplay,
+				run.isCorrupted() ? "CG" : "Norm",
+				outcomeSymbol
 			};
 			tableModel.addRow(row);
 		}
-
-		// Update chart with all runs
-		chart.setData(history);
 	}
 }

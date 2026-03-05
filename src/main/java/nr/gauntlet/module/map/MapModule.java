@@ -320,7 +320,13 @@ public class MapModule implements Module
 
 	private boolean isNotInGauntlet()
 	{
-		for (int region : client.getMapRegions())
+		int[] regions = client.getMapRegions();
+		if (regions == null)
+		{
+			return true;
+		}
+		
+		for (int region : regions)
 		{
 			if (region == CORRUPTED_GAUNTLET_REGION_ID || region == GAUNTLET_REGION_ID)
 			{
