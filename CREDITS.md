@@ -1,6 +1,6 @@
 # Credits & Attribution
 
-This project, **Gauntlet Toolkit**, is a derivative work that integrates code and assets from three excellent RuneLite community plugins. All original work remains under the BSD 2-Clause License, and this derivative maintains the same license while properly attributing all contributors.
+This project, **The Gauntlet**, is a derivative work that integrates code and assets from three excellent RuneLite community plugins. All original work remains under the BSD 2-Clause License, and this derivative maintains the same license while properly attributing all contributors.
 
 ---
 

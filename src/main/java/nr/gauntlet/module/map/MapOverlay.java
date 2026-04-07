@@ -2,7 +2,7 @@
  * BSD 2-Clause License
  *
  * Copyright (c) 2023, Tyler (StickySerum) (Original Gauntlet Map plugin)
- * Copyright (c) 2026, Integration and modifications for Gauntlet Toolkit
+ * Copyright (c) 2026, Integration and modifications for The Gauntlet
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

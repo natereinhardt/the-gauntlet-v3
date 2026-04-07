@@ -1,4 +1,4 @@
-# Gauntlet Toolkit
+# The Gauntlet
 
 <div align="center">
 

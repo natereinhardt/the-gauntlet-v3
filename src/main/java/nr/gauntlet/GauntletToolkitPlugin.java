@@ -56,7 +56,7 @@ import net.runelite.client.util.ImageUtil;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Gauntlet Toolkit",
+	name = "The Gauntlet",
 	description = "Comprehensive all-in-one plugin for The Gauntlet with map, stats, and overlays",
 	tags = {"the", "gauntlet", "toolkit"}
 )
